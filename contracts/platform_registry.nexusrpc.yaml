@@ -1,0 +1,56 @@
+# Platform's registration Service, owned by the Platform team.
+#
+# This file is the contract for the PlatformRegistry Nexus Service. Teams register
+# their tools with the agent gateway through it, from their own Namespaces: each team
+# calls it through its own Endpoint, platform-registry-<team>, and every one of those
+# Endpoints routes to the same Platform handler. gateway/generated/ is built from it
+# (run `make generate`; never edit the output by hand).
+#
+# It isn't a tool on the gateway, so it has no registration file.
+nexusrpc: "1.0.0"
+$schema: https://json-schema.org/draft/2020-12/schema
+
+services:
+  PlatformRegistry:
+    fqn: PlatformRegistry
+    description: Register a team's tools with the agent gateway.
+    operations:
+      registerTool:
+        fqn: register_tool
+        description: >-
+          Register every tool in a team's registration file. Platform reads the team
+          from the Endpoint the call arrived on, and refuses tools another team owns.
+        input: { $ref: "#/$defs/RegisterToolInput" }
+        output: { $ref: "#/$defs/RegisterToolOutput" }
+
+$defs:
+  RegisterToolInput:
+    type: object
+    additionalProperties: false
+    properties:
+      registration_file:
+        type: string
+        description: The registration file's path, such as contracts/security_review.registration.yaml.
+      registration:
+        type: string
+        description: The registration file's contents.
+      contract:
+        type: string
+        description: The contents of the NexGen contract the registration file names.
+      published_by:
+        type: string
+        description: Who published, for the audit. The team itself comes from the Endpoint.
+    required: [registration_file, registration, contract, published_by]
+
+  RegisterToolOutput:
+    type: object
+    properties:
+      tools:
+        type: array
+        items:
+          type: string
+      registry_version:
+        type: integer
+      team:
+        type: string
+    required: [tools, registry_version, team]

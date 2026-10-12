@@ -1,0 +1,53 @@
+[project]
+name = "temporal-ai-nexus-agent-gateway"
+version = "0.1.0"
+description = "An agent gateway with Temporal Nexus: every team's tools, one set of rules."
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+    # Pre-release Temporal features (Temporal Operation Handler, Update-backed
+    # Operations) are used; APIs may change, so versions are pinned exactly.
+    "temporalio==1.34.0",
+    "mcp==2.3.0",
+    "jsonschema==4.26.0",
+    "pyyaml==6.0.3",
+    "starlette==1.7.0",
+    "uvicorn==0.54.0",
+    "python-dotenv==1.2.4",
+]
+
+[dependency-groups]
+# Only used with REVIEWER=claude. The default mock reviewer is key-free and never
+# imports it. Installed by default so lint and type checks see it; skip it with
+# `uv sync --no-group real-model`.
+real-model = ["anthropic==1.11.0"]
+dev = [
+    "pytest==9.1.1",
+    "pytest-asyncio==1.4.0",
+    "ruff==0.16.10",
+    "pyright==1.1.414",
+]
+
+[tool.uv]
+package = false
+default-groups = ["dev", "real-model"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+markers = [
+    "slow: waits on the Temporal server's background work; make test skips it, run it with uv run pytest -m slow",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+extend-exclude = ["*/generated", ".contract-check"]
+
+[tool.pyright]
+include = ["gateway", "release_eng", "security", "demo", "console", "tests"]
+exclude = ["**/generated", ".contract-check", ".venv"]
+pythonVersion = "3.12"

@@ -1,0 +1,27 @@
+# How the gateway reaches Release Engineering's tools. Owned by the Release Engineering team.
+#
+# Nexus Endpoints don't publish their Operations or schemas at runtime, so the
+# gateway keeps a registry. To register these tools, the gateway reads this file
+# and the contract beside it: the contract supplies each tool's Service, Operation,
+# description, and input schema; this file supplies the routing and timeouts.
+# A tool's name is its Operation's `fqn` in the contract. Each tool declares a
+# `summary`: how this team describes one call in a single line, filled from the
+# call's arguments. The gateway uses it in replies, audit rows, and the Temporal
+# UI, and falls back to the tool name and argument values if a tool has none.
+#
+# Setup and `make reset` register these tools.
+
+contract: release_engineering.nexusrpc.yaml
+owner_team: release-eng
+endpoint: release-eng-tools
+
+tools:
+  get_release_status:
+    mode_hint: sync
+    schedule_to_close_seconds: 30
+    summary: "read the release status of {service}"
+
+  deploy:
+    mode_hint: async
+    schedule_to_close_seconds: 1800 # 30 minutes
+    summary: "deploy {service} {version} to {environment}"

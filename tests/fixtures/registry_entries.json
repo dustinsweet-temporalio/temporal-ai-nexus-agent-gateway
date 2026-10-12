@@ -1,0 +1,116 @@
+[
+  {
+    "contract": "contracts/release_engineering.nexusrpc.yaml",
+    "contract_sha256": "4cf415c4839b30c11bc20ee9a06ee30022794a66df429ce79330407d6bf82e98",
+    "description": "Show which version of a service is live on staging and on production, who deployed it and when, and which builds are ready to deploy.",
+    "endpoint": "release-eng-tools",
+    "input_schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "service": {
+          "description": "The service to look up.",
+          "enum": [
+            "checkout-api"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "service"
+      ],
+      "type": "object"
+    },
+    "mode_hint": "sync",
+    "name": "get_release_status",
+    "operation": "get_release_status",
+    "owner_team": "release-eng",
+    "registration": "contracts/release_engineering.registration.yaml",
+    "schedule_to_close_seconds": 30,
+    "service": "ReleaseEngineering",
+    "summary_template": "read the release status of {service}"
+  },
+  {
+    "contract": "contracts/release_engineering.nexusrpc.yaml",
+    "contract_sha256": "4cf415c4839b30c11bc20ee9a06ee30022794a66df429ce79330407d6bf82e98",
+    "description": "Deploy a build of a service to staging or production. A deploy rolls out in waves and takes minutes, then reports whether it succeeded.",
+    "endpoint": "release-eng-tools",
+    "input_schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "environment": {
+          "description": "Where to deploy it.",
+          "enum": [
+            "staging",
+            "production"
+          ],
+          "type": "string"
+        },
+        "service": {
+          "description": "The service to deploy.",
+          "enum": [
+            "checkout-api"
+          ],
+          "type": "string"
+        },
+        "version": {
+          "description": "The version to deploy, as MAJOR.MINOR.PATCH, for example 2.3.1.",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "service",
+        "version",
+        "environment"
+      ],
+      "type": "object"
+    },
+    "mode_hint": "async",
+    "name": "deploy",
+    "operation": "deploy",
+    "owner_team": "release-eng",
+    "registration": "contracts/release_engineering.registration.yaml",
+    "schedule_to_close_seconds": 1800,
+    "service": "ReleaseEngineering",
+    "summary_template": "deploy {service} {version} to {environment}"
+  },
+  {
+    "contract": "contracts/security_review.nexusrpc.yaml",
+    "contract_sha256": "4640b645bb57ba4345b6be8ab87a89e50adb0f33ba6b38301a60b758e4a08105",
+    "description": "Ask Security to review a release. A reviewer agent reads the change, then a Security engineer approves or rejects it.",
+    "endpoint": "security-tools",
+    "input_schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "service": {
+          "description": "The service the release belongs to.",
+          "enum": [
+            "checkout-api"
+          ],
+          "type": "string"
+        },
+        "version": {
+          "description": "The version to review, as MAJOR.MINOR.PATCH, for example 2.4.0.",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "service",
+        "version"
+      ],
+      "type": "object"
+    },
+    "mode_hint": "async",
+    "name": "review_release",
+    "operation": "review_release",
+    "owner_team": "security",
+    "registration": "contracts/security_review.registration.yaml",
+    "schedule_to_close_seconds": 604800,
+    "service": "SecurityReview",
+    "summary_template": "review {service} {version}"
+  }
+]

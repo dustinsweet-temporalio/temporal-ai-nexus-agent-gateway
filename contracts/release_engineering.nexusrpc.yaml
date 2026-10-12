@@ -1,0 +1,140 @@
+# Release Engineering's tools, owned by the Release Engineering team.
+#
+# This file is the contract for the ReleaseEngineering Nexus Service behind the
+# release-eng-tools Endpoint. Two things are built from it:
+#   - release_eng/generated/: typed models, validators, and the Service definition
+#     (run `make generate`; never edit the output by hand).
+#   - The gateway's tool definitions: when a tool is registered, the gateway reads
+#     this file and serves each Operation's input schema and description to agents.
+#
+# Operation keys are camelCase because NexGen requires it. Each `fqn` sets the
+# snake_case name that callers, the gateway, and its policy use on the wire.
+nexusrpc: "1.0.0"
+$schema: https://json-schema.org/draft/2020-12/schema
+
+services:
+  ReleaseEngineering:
+    fqn: ReleaseEngineering
+    description: Release status and deploys for Pinecrest Outfitters services.
+    operations:
+      getReleaseStatus:
+        fqn: get_release_status
+        description: >-
+          Show which version of a service is live on staging and on production,
+          who deployed it and when, and which builds are ready to deploy.
+        input: { $ref: "#/$defs/ReleaseStatusInput" }
+        output: { $ref: "#/$defs/ReleaseStatusOutput" }
+      deploy:
+        fqn: deploy
+        description: >-
+          Deploy a build of a service to staging or production. A deploy rolls
+          out in waves and takes minutes, then reports whether it succeeded.
+        input: { $ref: "#/$defs/DeployInput" }
+        output: { $ref: "#/$defs/DeployOutput" }
+
+$defs:
+  # Inputs reject unknown fields, so a malformed call fails with a clear list of
+  # violations. Outputs stay open so the team can add fields without breaking callers.
+  ReleaseStatusInput:
+    type: object
+    additionalProperties: false
+    properties:
+      service:
+        type: string
+        enum: ["checkout-api"]
+        description: The service to look up.
+    required: [service]
+
+  ReleaseStatusOutput:
+    type: object
+    properties:
+      service:
+        type: string
+        description: The service this status describes.
+      environments:
+        $ref: "#/$defs/Environments"
+      candidates:
+        type: array
+        description: Builds that are ready to deploy, oldest first.
+        items: { $ref: "#/$defs/Candidate" }
+    required: [service, environments, candidates]
+
+  Environments:
+    type: object
+    description: What is live in each environment.
+    properties:
+      staging: { $ref: "#/$defs/Deployment" }
+      production: { $ref: "#/$defs/Deployment" }
+    required: [staging, production]
+
+  Deployment:
+    type: object
+    description: The version live in one environment.
+    properties:
+      version:
+        type: string
+        description: The live version, for example 2.3.0.
+      deployed_at:
+        type: string
+        format: date-time
+        description: When this version went live (RFC 3339).
+      deployed_by:
+        type: string
+        description: Who the deploy ran for.
+    required: [version, deployed_at, deployed_by]
+
+  Candidate:
+    type: object
+    description: A build that is ready to deploy.
+    properties:
+      version:
+        type: string
+        description: The build's version.
+      summary:
+        type: string
+        description: One line on what the build changes.
+    required: [version, summary]
+
+  DeployInput:
+    type: object
+    additionalProperties: false
+    properties:
+      service:
+        type: string
+        enum: ["checkout-api"]
+        description: The service to deploy.
+      version:
+        type: string
+        pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        description: The version to deploy, as MAJOR.MINOR.PATCH, for example 2.3.1.
+      environment:
+        type: string
+        enum: ["staging", "production"]
+        description: Where to deploy it.
+    required: [service, version, environment]
+
+  DeployOutput:
+    type: object
+    properties:
+      deployment_id:
+        type: string
+        description: The deploy's ID, for finding it in Release Engineering's records.
+      service:
+        type: string
+        description: The service that was deployed.
+      version:
+        type: string
+        description: The version that was deployed.
+      environment:
+        type: string
+        enum: ["staging", "production"]
+        description: Where it was deployed.
+      status:
+        type: string
+        enum: ["succeeded", "failed"]
+        description: Whether the deploy succeeded.
+      completed_at:
+        type: string
+        format: date-time
+        description: When the deploy finished (RFC 3339).
+    required: [deployment_id, service, version, environment, status, completed_at]

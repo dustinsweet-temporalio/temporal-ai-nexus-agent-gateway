@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Release console · Pinecrest Outfitters</title>
+  <link rel="icon" href="pinecrest-mark.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/Inter-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/JetBrainsMono-Medium.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="canvas">
+    <header id="topbar" data-zoom="topbar">
+      <div class="brand">
+        <!-- The Pinecrest mark: an original pine in front of a ridge line. -->
+        <svg class="mark" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 30h30"/>
+          <path d="M15 25l6-9 4 5 3-3.5 5 7.5"/>
+          <path d="M11 5l5 7h-2.5l4 6h-13l4-6H6z"/>
+          <path d="M11 18v7"/>
+        </svg>
+        <div class="names">
+          <span class="company">Pinecrest Outfitters</span>
+          <span class="product">Release console <span aria-hidden="true">·</span> <span class="mono" id="service-name">checkout-api</span></span>
+        </div>
+      </div>
+      <div class="status-pills" id="status-pills"></div>
+      <div class="topbar-spacer"></div>
+      <div id="workers" data-zoom="workers" aria-label="Workers"></div>
+      <div class="menu-wrap">
+        <button class="menu-button" id="scenario-button" aria-haspopup="true" aria-expanded="false" aria-controls="scenario-menu">Scenario <span data-icon="chevron-down" class="sm"></span></button>
+        <div class="menu" id="scenario-menu" role="menu"></div>
+      </div>
+      <div class="menu-wrap">
+        <button class="menu-button" id="signin-button" aria-haspopup="true" aria-expanded="false" aria-controls="signin-menu"></button>
+        <div class="menu" id="signin-menu" role="menu"></div>
+      </div>
+    </header>
+
+    <main>
+      <section class="col left">
+        <section class="card" id="registry-panel" data-zoom="registry" aria-labelledby="registry-title"></section>
+        <section class="card" id="policy-panel" data-zoom="policy" aria-labelledby="policy-title"></section>
+      </section>
+
+      <section class="col center">
+        <section class="card" id="pipeline" data-zoom="pipeline" aria-labelledby="pipeline-title"></section>
+        <section class="card" id="calls-diagram" data-zoom="calls" aria-labelledby="calls-title"></section>
+        <section class="card" id="audit-bar" data-zoom="audit" style="padding: 0"></section>
+        <div id="audit-drawer" role="dialog" aria-labelledby="audit-title"></div>
+      </section>
+
+      <section class="col right">
+        <section id="focus-panel" data-zoom="focus" aria-live="polite"></section>
+      </section>
+    </main>
+
+    <div id="schema-popover" role="dialog" aria-modal="false"></div>
+    <div id="problems" aria-live="assertive"></div>
+
+    <div id="guides" aria-hidden="true">
+      <div class="guide" id="guide-caption"><span>Caption band (y 960 to 1080)</span></div>
+      <div class="guide" id="guide-webcam"><span>Webcam corner</span></div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

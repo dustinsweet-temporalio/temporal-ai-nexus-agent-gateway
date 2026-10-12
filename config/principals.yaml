@@ -1,0 +1,33 @@
+# Demo identities for Pinecrest Outfitters. DEMO AUTHENTICATION ONLY.
+#
+# The gateway's front door maps an MCP bearer token to one of these people, and the
+# console's sign-in menu switches between them. Nobody logs in; the tokens below are
+# fixed, public, and only ever accepted on localhost. In production, identities come
+# from your identity provider, and the gateway signs the principal it passes to teams.
+#
+# Roles decide who may approve what: `checkout-lead` approves production deploys
+# under policy version 1, and Security decides reviews (any member of the security
+# team may decide). Setup and `make reset` load this file into the gateway's
+# registry, leaving out a team that hasn't joined yet (Security, until it joins), and
+# Security's review desk receives the people and teams in its start input.
+
+teams:
+  checkout: Checkout
+  release-eng: Release Engineering
+  security: Security
+  platform: Platform
+
+people:
+  - email: noah@pinecrest.example
+    name: Noah Proovle
+    title: Checkout lead
+    team: checkout
+    roles: [checkout-lead]
+    demo_token: demo-token-noah
+
+  - email: abe@pinecrest.example
+    name: Abe Roover
+    title: Security engineer
+    team: security
+    roles: [security-reviewer]
+    demo_token: demo-token-abe

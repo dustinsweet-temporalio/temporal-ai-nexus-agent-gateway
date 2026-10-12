@@ -1,0 +1,97 @@
+# Security's tools, owned by the Security team.
+#
+# This file is the contract for the SecurityReview Nexus Service behind the
+# security-tools Endpoint. Two things are built from it:
+#   - security/generated/: typed models, validators, and the Service definition
+#     (run `make generate`; never edit the output by hand).
+#   - The gateway's tool definition: when Security publishes the tool, the gateway
+#     reads this file and serves the Operation's input schema and description to agents.
+#
+# Operation keys are camelCase because NexGen requires it. Each `fqn` sets the
+# snake_case name that callers, the gateway, and its policy use on the wire.
+nexusrpc: "1.0.0"
+$schema: https://json-schema.org/draft/2020-12/schema
+
+# region snippet:contract-review-release
+services:
+  SecurityReview:
+    fqn: SecurityReview
+    description: Security reviews of releases.
+    operations:
+      reviewRelease:
+        fqn: review_release
+        description: >-
+          Ask Security to review a release. A reviewer agent reads the change,
+          then a Security engineer approves or rejects it.
+        input: { $ref: "#/$defs/ReviewReleaseInput" }
+        output: { $ref: "#/$defs/ReviewReleaseOutput" }
+# endregion
+
+$defs:
+  # The input rejects unknown fields, so a malformed call fails with a clear list
+  # of violations. The output stays open so Security can add fields later.
+  # Who asked for the review is not an input: it travels in Nexus headers.
+  ReviewReleaseInput:
+    type: object
+    additionalProperties: false
+    properties:
+      service:
+        type: string
+        enum: ["checkout-api"]
+        description: The service the release belongs to.
+      version:
+        type: string
+        pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        description: The version to review, as MAJOR.MINOR.PATCH, for example 2.4.0.
+    required: [service, version]
+
+  ReviewReleaseOutput:
+    type: object
+    properties:
+      service:
+        type: string
+        description: The service that was reviewed.
+      version:
+        type: string
+        description: The version that was reviewed.
+      decision:
+        type: string
+        enum: ["approved", "rejected"]
+        description: Security's decision.
+      decided_by:
+        type: string
+        format: email
+        description: Email of the Security engineer who decided.
+      findings:
+        type: array
+        description: What the reviewer agent found, most severe first.
+        items: { $ref: "#/$defs/Finding" }
+      recommendation:
+        type: string
+        enum: ["approve", "reject"]
+        description: The reviewer agent's recommendation. A person makes the decision.
+      summary:
+        type: string
+        description: One paragraph from the reviewer agent explaining its recommendation.
+      decided_at:
+        type: string
+        format: date-time
+        description: When Security decided (RFC 3339).
+    required:
+      [service, version, decision, decided_by, findings, recommendation, summary, decided_at]
+
+  Finding:
+    type: object
+    description: One thing the reviewer agent found.
+    properties:
+      severity:
+        type: string
+        enum: ["info", "low", "medium", "high"]
+        description: How serious it is.
+      title:
+        type: string
+        description: A short name for the finding.
+      detail:
+        type: string
+        description: What was found and why it matters.
+    required: [severity, title, detail]

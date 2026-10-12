@@ -1,0 +1,47 @@
+{
+  "_about": "Stands in for source control: what changed in checkout-api 2.4.0. The reviewer agent reads only this file. The advisory results stand in for a vulnerability feed.",
+  "service": "checkout-api",
+  "version": "2.4.0",
+  "previous_version": "2.3.1",
+  "title": "Adds trail-pricing estimates",
+  "release_notes": "Shows an estimated price for guided trail trips on the checkout page, using a new client for the internal trail-pricing service. The estimate is behind the `trail_pricing_estimates` feature flag, which is off by default. The client times out after 800 ms and falls back to the last cached estimate, or hides the estimate if there is none.",
+  "author": "checkout team",
+  "files_changed": [
+    {"path": "checkout_api/pricing/trail_pricing_client.py", "change": "added", "lines_added": 142, "lines_removed": 0},
+    {"path": "checkout_api/pricing/trail_pricing_cache.py", "change": "added", "lines_added": 64, "lines_removed": 0},
+    {"path": "checkout_api/pricing/models.py", "change": "modified", "lines_added": 28, "lines_removed": 2},
+    {"path": "checkout_api/pricing/__init__.py", "change": "modified", "lines_added": 3, "lines_removed": 0},
+    {"path": "checkout_api/checkout/summary.py", "change": "modified", "lines_added": 37, "lines_removed": 6},
+    {"path": "checkout_api/checkout/views.py", "change": "modified", "lines_added": 19, "lines_removed": 4},
+    {"path": "checkout_api/templates/checkout/summary.html", "change": "modified", "lines_added": 22, "lines_removed": 1},
+    {"path": "checkout_api/feature_flags.py", "change": "modified", "lines_added": 6, "lines_removed": 0},
+    {"path": "checkout_api/settings/base.py", "change": "modified", "lines_added": 9, "lines_removed": 0},
+    {"path": "checkout_api/settings/production.py", "change": "modified", "lines_added": 3, "lines_removed": 0},
+    {"path": "checkout_api/metrics.py", "change": "modified", "lines_added": 11, "lines_removed": 0},
+    {"path": "tests/pricing/test_trail_pricing_client.py", "change": "added", "lines_added": 188, "lines_removed": 0},
+    {"path": "tests/pricing/test_trail_pricing_cache.py", "change": "added", "lines_added": 74, "lines_removed": 0},
+    {"path": "tests/checkout/test_summary.py", "change": "modified", "lines_added": 52, "lines_removed": 3},
+    {"path": "tests/conftest.py", "change": "modified", "lines_added": 14, "lines_removed": 0},
+    {"path": "docs/pricing.md", "change": "modified", "lines_added": 31, "lines_removed": 0},
+    {"path": "pyproject.toml", "change": "modified", "lines_added": 2, "lines_removed": 1},
+    {"path": "uv.lock", "change": "modified", "lines_added": 41, "lines_removed": 12}
+  ],
+  "dependency_changes": [
+    {
+      "name": "pinecrest-http",
+      "from_version": "3.4.1",
+      "to_version": "3.5.0",
+      "kind": "minor version bump",
+      "license": "Apache-2.0",
+      "known_advisories": []
+    },
+    {
+      "name": "trailcalc",
+      "from_version": null,
+      "to_version": "0.4.2",
+      "kind": "new package",
+      "license": "MIT",
+      "known_advisories": []
+    }
+  ]
+}

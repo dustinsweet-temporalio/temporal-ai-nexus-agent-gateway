@@ -1,0 +1,20 @@
+# How the gateway reaches Security's tools. Owned by the Security team.
+#
+# Nexus Endpoints don't publish their Operations or schemas at runtime, so the
+# gateway keeps a registry. To register this tool, the gateway reads this file
+# and the contract beside it: the contract supplies the tool's Service, Operation,
+# description, and input schema; this file supplies the routing and timeout.
+# A tool's name is its Operation's `fqn` in the contract.
+#
+# Security publishes this tool during the demo with `make publish-security` or the
+# console's Scenario menu.
+
+contract: security_review.nexusrpc.yaml
+owner_team: security
+endpoint: security-tools
+
+tools:
+  review_release:
+    mode_hint: async
+    schedule_to_close_seconds: 604800 # 7 days
+    summary: "review {service} {version}"

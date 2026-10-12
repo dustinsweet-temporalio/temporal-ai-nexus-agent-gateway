@@ -1,0 +1,15 @@
+# Connection profiles for the local dev server (PROFILE=local, the default).
+# One profile per team, because each team's Worker connects to its own Namespace.
+# TEMPORAL_PORT in .env overrides the port below if 7233 is taken.
+
+[profile.platform]
+address = "localhost:7233"
+namespace = "platform"
+
+[profile.release-eng]
+address = "localhost:7233"
+namespace = "release-eng"
+
+[profile.security]
+address = "localhost:7233"
+namespace = "security"

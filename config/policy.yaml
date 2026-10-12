@@ -1,0 +1,62 @@
+# The gateway's policy, owned by the Platform team. Two versions tell the story.
+#
+# For each tool call, the first rule whose `tool` and `when` match decides. Before
+# any allow, require_approval, or require_gate takes effect, the gateway checks
+# one implicit rule, `blocked-release`: a release someone rejected stays denied.
+# A call no rule matches gets `default`.
+#
+# Effects: allow (run it), deny (refuse it), require_approval (hold it for a
+# person with `approver_role`), require_gate (run the `gate` tool first; run this
+# call only if the gate approves).
+#
+# A rule that can reject a call may declare `blocks_release`: which argument fields
+# identify the release a rejection blocks, and how messages name it. A rule without
+# it blocks nothing. The gateway never guesses what argument names mean.
+#
+# Setup and `make reset` load version 1. The console's "Apply Security mandate"
+# scenario control and `make apply-mandate` load version 2.
+
+# Version 1: Checkout ships, and Checkout's lead approves production.
+version: 1
+default: deny
+rules:
+  - id: status-read
+    tool: get_release_status
+    effect: allow
+  - id: deploy-staging
+    tool: deploy
+    when: { environment: staging }
+    effect: allow
+  - id: deploy-production-approval
+    tool: deploy
+    when: { environment: production }
+    effect: require_approval
+    approver_role: checkout-lead
+    blocks_release:
+      fields: [service, version, environment]
+      label: "{service} {version} to {environment}"
+---
+# Version 2: the Security mandate. Production requires Security's review.
+version: 2
+default: deny
+rules:
+  - id: status-read
+    tool: get_release_status
+    effect: allow
+  - id: deploy-staging
+    tool: deploy
+    when: { environment: staging }
+    effect: allow
+  # region snippet:policy-gate-rule
+  - id: deploy-production-security-gate
+    tool: deploy
+    when: { environment: production }
+    effect: require_gate
+    gate: review_release
+    blocks_release:
+      fields: [service, version, environment]
+      label: "{service} {version} to {environment}"
+  # endregion
+  - id: review-on-request
+    tool: review_release
+    effect: allow

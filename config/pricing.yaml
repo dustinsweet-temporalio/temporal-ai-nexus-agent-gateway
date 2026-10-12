@@ -1,0 +1,11 @@
+# Model prices used for the console's cost meter and the README's cost figures.
+# US dollars per million tokens, Anthropic first-party API rates. Prices change:
+# check them before relying on these numbers, and update `as_of` when you do.
+
+as_of: "2026-09-25"
+source: "https://platform.claude.com/docs/en/about-claude/pricing"
+
+models:
+  claude-sonnet-5-5:
+    input_per_mtok: 2.00
+    output_per_mtok: 10.00

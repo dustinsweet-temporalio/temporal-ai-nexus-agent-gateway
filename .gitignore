@@ -1,0 +1,22 @@
+# Secrets and local config
+.env
+config/profiles/cloud.toml
+
+# Local demo state
+.demo-state/
+
+# Scratch output from `make check-contracts`
+.contract-check/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Per-machine Claude Code settings
+.claude/settings.local.json
+
+# macOS folder metadata
+.DS_Store
