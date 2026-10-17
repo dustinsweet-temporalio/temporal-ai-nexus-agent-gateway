@@ -17,8 +17,6 @@ This repo shows an AI agent gateway on Temporal with Temporal Nexus. Every agent
 
 ![The release console during a production deployment of checkout-api 2.4.0. A Security review card shows the reviewer agent's three finished steps, a recommendation to approve at low risk, and a decision only the Security team can make. The pipeline shows 2.4.0 on staging, waiting for Security's review before production. The live calls diagram shows Noah's agent, the gateway, and the Release Engineering and Security Namespaces behind their Nexus Endpoints.](assets/console.png)
 
-Last verified 2026-10-16 on macOS: tests, lint, and the key-free demo with a Worker kill, recovery, and reset. The real Claude reviewer wasn't re-run.
-
 ## The failure mode
 
 This demo is built around two failures:
@@ -229,8 +227,7 @@ None of the seven steps changes the gateway's code.
 </details>
 
 ### Slides
-
-Dustin's slides will be linked here once they're posted.
+[Presentation Deck](docs/temporal-ai-nexus-agent-gateway-deck.pdf)
 
 ### Further reading
 
@@ -245,3 +242,4 @@ Thanks to Shy, Tushar, Josh, Melanie, and Duncan for the reviews that shaped thi
 ---
 
 **Ready to try this in your own agent?** [Get started here](https://t.mp/ai-video-cta-002).
+ß
