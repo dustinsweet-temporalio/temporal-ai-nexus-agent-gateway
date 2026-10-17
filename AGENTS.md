@@ -2,6 +2,18 @@
 
 An AI agent gateway on Temporal with Temporal Nexus, for a fictional retailer, Pinecrest Outfitters. Agents reach tools only through the gateway (`gateway/`, Namespace `platform`), which applies policy, holds calls for a person's approval, and records every step. Each team owns its tools behind its own Nexus Endpoint: Release Engineering (`release_eng/`, Namespace `release-eng`) and Security (`security/`, Namespace `security`). Security isn't part of the start state; it joins during the demo. `README.md` explains the design and its limits, and `docs/add-a-tool.md` walks through adding a team's tool.
 
+## Commands
+
+| Command | Success looks like |
+|---|---|
+| `make setup` | `uv <version>: ok` and `Temporal CLI <version>: ok` (needs Temporal CLI 1.9.1 or newer) |
+| `make run` | `The Pinecrest agent gateway is running.` |
+| `make demo AUTO_DECIDE=1` | Ends with `Production is 2.4.0.` and exits 0 (unattended; needs `make run` in another terminal) |
+| `make test` | `N passed`, offline, with no model calls |
+| `make lint` | `All checks passed!` from ruff, then `0 errors, 0 warnings, 0 informations` from pyright |
+| `make check-contracts` | `Registry fixture matches the contracts (3 tools).` (needs NexGen 0.2.5 on your PATH) |
+| `make reset` | `Reset: a fresh dev server, policy v1, Release Engineering's tools, no sessions.` |
+
 ## Always
 
 - Run `make test` (offline, no model calls) and `make lint` before proposing a change. `make lint` passes with `0 errors` from pyright.
@@ -37,3 +49,4 @@ An AI agent gateway on Temporal with Temporal Nexus, for a fictional retailer, P
 - Set an LLM client's retries above 0. Temporal owns retries.
 - Commit `.env`, API keys, real account IDs, or real company names.
 - Use em dashes in docs.
+- Describe the `ApprovalStatus` Search Attribute as something this repo does. The video shows it as a tip, and the README lists it under "Two notes the video adds".

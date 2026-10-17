@@ -161,6 +161,8 @@ A new Namespace takes a moment to reach every part of the dev server. If you run
 
 The local dev server has no Endpoint allowlists, so any Namespace can call either Endpoint. On Temporal Cloud, each Endpoint has an allowlist of caller Namespaces: `platform-registry-security` would allow only Security's Namespace, and `security-tools` only the gateway's. This repo has been tested only on the local dev server.
 
+A new Namespace isn't a requirement of Nexus. This repo gives each team its own to show the boundary between teams, but an Endpoint can also target a Task Queue in its caller's own Namespace. When one team runs several agents in the same Namespace, they still get the contract and calls that survive a crash. On Temporal Cloud, that Namespace still has to be on the Endpoint's allowlist, because no caller is allowed by default, even one in the same Namespace.
+
 ## 7. Publish the tool from Security's own Namespace
 
 Security never connects to Platform's Namespace. It registers its tool the way every team does: a small publish Workflow in its own Namespace calls Platform's registration Service over Nexus, through its own registration Endpoint. Platform reads the team from the Endpoint the call arrives on, which the server sets, so Security can register only Security's tools.
@@ -211,7 +213,7 @@ The same seven steps, with your team's names:
 3. `nexgen python contracts/<team>.nexusrpc.yaml --output <team>/generated`. NexGen creates the folders.
 4. A `<team>/` folder with a copy of `gateway/connection.py`, your handler, and your Worker, and a `[profile.<team>]` in `config/profiles/local.toml`.
 5. Platform adds your policy rules to `config/policy.yaml` and your team under `teams:` in `config/principals.yaml`. To load an edited rule into a running demo, run `uv run python -m demo.seed reload-policy`.
-6. Your Namespace and your two Endpoints, `<team>-tools` and `platform-registry-<team>`, with the `temporal operator` commands in step 6. On Temporal Cloud, give `platform-registry-<team>` an allowlist with only your Namespace.
+6. Your Namespace and your two Endpoints, `<team>-tools` and `platform-registry-<team>`, with the `temporal operator` commands in step 6. On Temporal Cloud, give `platform-registry-<team>` an allowlist with only your Namespace. If your team already has a Namespace for its agents, you can use it instead of creating one (see the end of step 6).
 7. A copy of `security/publish.py` as `<team>/publish.py`, with your names at the top, run by your Worker. Then `uv run python -m <team>.publish contracts/<team>.registration.yaml`.
 
 `make check-contracts` compares the registry fixture with every registration file, so record your tool and run the tests:
