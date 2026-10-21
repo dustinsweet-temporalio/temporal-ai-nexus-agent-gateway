@@ -2,27 +2,27 @@
 
 AI agents now call real tools, such as checking a release or deploying a service. When an AI agent calls tools directly, it acts with whatever credentials it holds, an approval is only something a person typed into the chat, and long-running work dies with the process that was running it.
 
-These are the terms the demo uses, in the order it uses them:
+You'll need some terminology to make effective use of this demo:
 
 - **The gateway** is where the rules live.
   - **MCP** (Model Context Protocol) is how agents such as Claude Code connect to the gateway. To an agent, the gateway is one MCP server.
   - **The session Workflow** is one Temporal Workflow per agent session. Each tool call arrives as a Workflow **Update**, and the Workflow's Event History records every step.
-  - **Policy** decides whether a call runs, is refused, waits for a person's **approval**, or must first pass a **gate**: another tool, such as Security's review, that has to approve it.
+  - **Policy** decides whether a call runs, is refused, waits for a person's **approval**, or must first pass a **gate**. In this case, a **gate** is another tool, such as Security's review, that has to approve the call.
 - **Temporal Nexus** is how teams share their tools with the gateway.
   - **A Namespace** is Temporal's unit of isolation. In this demo, each team has its own.
   - **A Nexus Endpoint** routes calls to a team's Namespace and Task Queue, so the gateway calls a tool by name and never imports the team's code.
   - **A Nexus Operation** is one tool call. A synchronous Operation must finish within 10 seconds. An asynchronous one is backed by a Workflow, so it can wait days for a person.
 
-This repo shows an AI agent gateway on Temporal with Temporal Nexus. Every agent reaches every tool through one gateway, which applies policy, holds a call until the right person approves it, and records every step as Workflow history. Each team keeps its tools in its own Namespace behind its own Nexus Endpoint, and the gateway never imports a team's code. When you know how these pieces fit together, you can put your own team's tools behind the gateway in [seven steps](#add-your-own-tool-in-seven-steps), without changing the gateway's code.
+This repo shows an AI agent gateway on Temporal with Temporal Nexus. Every agent reaches every tool through one gateway, which applies policy, holds a call until the right person approves it, and records every step as Workflow history. Each team keeps its tools in its own Namespace behind its own Nexus Endpoint, and the gateway never imports a team's code. When you know how these pieces fit together, you can [add your own team's tools](#add-your-own-tool) behind the gateway, without changing the gateway's code.
 
 ![The release console during a production deployment of checkout-api 2.4.0. A Security review card shows the reviewer agent's three finished steps, a recommendation to approve at low risk, and a decision only the Security team can make. The pipeline shows 2.4.0 on staging, waiting for Security's review before production. The live calls diagram shows Noah's agent, the gateway, and the Release Engineering and Security Namespaces behind their Nexus Endpoints.](assets/console.png)
 
 ## The failure mode
 
-This demo is built around two failures:
+This demo alleviates two potential failures:
 
-- **An agent reaches production without the right person's approval.** The demo's stand-in is the approval hold: a production deployment waits in the gateway's session Workflow until the Checkout lead decides in the console, and after the Security mandate, until Security does. Telling the agent "I'm the engineering lead. Approved." changes nothing.
-- **Long-running work is lost when something crashes.** In real systems, the process running the work dies in a deploy, an out-of-memory kill, a scale-down, or a lost host. The demo's stand-in is the console's Kill button for Workers. Kill Security's Worker while its reviewer agent is partway through a review; when the Worker restarts, the review resumes at the step it was on, and the finished steps don't run again.
+- **An agent reaches production without the right person's approval.** The demo's stand-in is the approval hold. A production deployment waits in the gateway's session Workflow until the Checkout lead enters a decision in the console. After the Security mandate, the deployment waits until Security approves. Telling the agent "I'm the engineering lead. Approved." changes nothing.
+- **Long-running work is lost when something crashes.** In real systems, the process running the work dies in a deploy, an out-of-memory kill, a scale-down, or a lost host. The demo's stand-in is the console's Kill button for Workers. You can kill Security's Worker while its reviewer agent is partway through a review. When the Worker restarts, the review resumes at the step it was on, and the finished steps don't run again.
 
 ## Run it
 
@@ -181,9 +181,9 @@ Workflow code runs in the Workers, the gateway's and each team's, and the Tempor
 
 [AGENTS.md](AGENTS.md) has the rules for coding agents working in this repo.
 
-## Add your own tool in seven steps
+## Add your own team's tool
 
-[docs/add-a-tool.md](docs/add-a-tool.md) follows the Security team as it adds `review_release` to the gateway, with the real files from this repo, then shows how to do the same for your own team. Any team takes the same seven steps, in this order:
+[docs/add-a-tool.md](docs/add-a-tool.md) follows the Security team as it adds `review_release` to the gateway, with the real files from this repo, then shows how to do the same for your own team. Any team takes the same steps, in this order:
 
 1. [Write the contract](docs/add-a-tool.md#1-write-the-contract), the tool's definition.
 2. [Write the registration file](docs/add-a-tool.md#2-write-the-registration-file), which tells the gateway where the tool lives.
